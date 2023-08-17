@@ -35,51 +35,7 @@
 #include "psow_color.hpp"
 #include "psow_vec3.hpp"
 #include "psow_ray.hpp"
-
-/*  Struct for dealing with spheres.                                          */
-struct sphere {
-
-    /*  A sphere is defined by its radius and its center.                     */
-    double radius;
-    psow::vec3 center;
-
-    /*  Empty constructor. Return NULL.                                       */
-    sphere(void)
-    {
-        return;
-    }
-
-    /*  Main constructor.                                                     */
-    sphere(double r, psow::vec3 c)
-    {
-        radius = r;
-        center = c;
-    }
-};
-/*  End of definition of sphere.                                              */
-
-/*  Since a sphere satisfies (x-x0)^2 + (y-y0)^2 + (z-z0)^2 = r^2, given a    *
- *  ray L(t) = p + tv, solving for which values of t satisfy the sphere's     *
- *  equation amounts to solving a quadratic equation.                         */
-static bool sphere_is_hit(psow::ray r, sphere s)
-{
-    psow::vec3 oc = r.p - s.center;
-    double a = (r.v).normsq();
-    double b = 2.0 * (r.v).dot(oc);
-    double c = oc.normsq() - s.radius*s.radius;
-    double D = b*b - 4.0*a*c;
-
-    if (D > 0.0)
-    {
-        if (a*(-b + sqrt(D)) > 0.0)
-            return true;
-        else
-            return false;
-    }
-    else
-        return false;
-}
-/*  End of sphere_is_hit.                                                     */
+#include "psow_sphere.hpp"
 
 /*  Function for coloring the background with a gradient.                     */
 static psow::color sky_gradient(psow::ray r)
@@ -98,32 +54,29 @@ static psow::color sky_gradient(psow::ray r)
 int main(void)
 {
     unsigned int m, n;
-    FILE *fp;
-    double width_factor, height_factor, u, v;
-    psow::ray r;
     psow::color color;
-    psow::vec3 direction;
     const double aspect_ratio = 16.0 / 9.0;
     const unsigned int image_width  = 1920U;
-    const unsigned int image_height
-        = (unsigned int)((double)image_width / aspect_ratio);
+    const unsigned int image_height = static_cast<unsigned int>(
+        static_cast<double>(image_width) / aspect_ratio
+    );
 
-    double viewport_height = 2.0;
-    double viewport_width  = viewport_height * aspect_ratio;
-    double focal_length = 1.0;
-    psow::color red = psow::color(255U, 0U, 0U);
+    const double viewport_height = 2.0;
+    const double viewport_width  = viewport_height * aspect_ratio;
+    const double width_factor  = 1.0 / (double)(image_width - 1U);
+    const double height_factor = 1.0 / (double)(image_height - 1U);
+    const double focal_length = 1.0;
+    const psow::color red = psow::color(255U, 0U, 0U);
+    const psow::sphere s = psow::sphere(0.5, psow::vec3(0, 0, -1));
+    const psow::vec3 origin = psow::vec3(0.0, 0.0, 0.0);
+    const psow::vec3 horizontal = psow::vec3(viewport_width, 0.0, 0.0);
+    const psow::vec3 vertical = psow::vec3(0.0, viewport_height, 0.0);
+    const psow::vec3 focal_point = psow::vec3(0.0, 0.0, focal_length);
 
-    sphere s = sphere(0.5, psow::vec3(0, 0, -1));
+    const psow::vec3 lower_left_corner =
+        origin - 0.5*(horizontal + vertical) - focal_point;
 
-    psow::vec3 origin = psow::vec3(0.0, 0.0, 0.0);
-    psow::vec3 horizontal, vertical, lower_left_corner;
-    horizontal = psow::vec3(viewport_width, 0.0, 0.0);
-    vertical   = psow::vec3(0.0, viewport_height, 0.0);
-
-    lower_left_corner = origin - (horizontal*0.5) - (vertical*0.5) -
-                        psow::vec3(0.0, 0.0, focal_length);
-
-    fp = std::fopen("test_ray_with_sphere.ppm", "w");
+    FILE *fp = std::fopen("test_ray_with_sphere.ppm", "w");
 
     if (!fp)
     {
@@ -132,19 +85,21 @@ int main(void)
     }
 
     std::fprintf(fp, "P6\n%u %u\n255\n", image_width, image_height);
-    width_factor  = 1.0 / (double)(image_width - 1U);
-    height_factor = 1.0 / (double)(image_height - 1U);
 
     for (m = image_height; m > 0; --m)
     {
+        const double v = m * height_factor;
+
         for (n = 0U; n < image_width; ++n)
         {
-            u = (double)n * width_factor;
-            v = (double)m * height_factor;
-            direction = lower_left_corner + horizontal*u + vertical*v - origin;
-            r = psow::ray(origin, direction);
+            const double u = n * width_factor;
 
-            if (sphere_is_hit(r, s))
+            const psow::vec3 direction = horizontal*u + vertical*v +
+                                         lower_left_corner - origin;
+
+            const psow::ray r = psow::ray(origin, direction);
+
+            if (s.intersects_ray(r))
                 color = red;
             else
                 color = sky_gradient(r);

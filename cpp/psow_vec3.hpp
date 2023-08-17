@@ -15,7 +15,7 @@
  *  along with thie file.  If not, see <https://www.gnu.org/licenses/>.       *
  ******************************************************************************
  *  Purpose:                                                                  *
- *     	Provides a struct for working with 3D vectors.                        *
+ *      Provides a struct for working with 3D vectors.                        *
  ******************************************************************************
  *  Author:     Ryan Maguire                                                  *
  *  Date:       August 17, 2023                                               *

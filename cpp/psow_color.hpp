@@ -15,7 +15,7 @@
  *  along with thie file.  If not, see <https://www.gnu.org/licenses/>.       *
  ******************************************************************************
  *  Purpose:                                                                  *
- *     	Provides a struct for working with colors.                            *
+ *      Provides a struct for working with colors.                            *
  ******************************************************************************
  *  Author:     Ryan Maguire                                                  *
  *  Date:       August 17, 2023                                               *

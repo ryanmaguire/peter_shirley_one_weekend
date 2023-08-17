@@ -15,67 +15,76 @@
  *  along with thie file.  If not, see <https://www.gnu.org/licenses/>.       *
  ******************************************************************************
  *  Purpose:                                                                  *
- *      Provides a struct for working with 3D rays.                           *
+ *      Provides a struct for working with sphere.                            *
  ******************************************************************************
  *  Author:     Ryan Maguire                                                  *
  *  Date:       August 17, 2023                                               *
  ******************************************************************************/
 
 /*  Include guard to prevent including this file twice.                       */
-#ifndef PSOW_RAY_HPP
-#define PSOW_RAY_HPP
+#ifndef PSOW_SPHERE_HPP
+#define PSOW_SPHERE_HPP
 
 /*  vec3 struct provided here.                                                */
 #include "psow_vec3.hpp"
 
+/*  ray struct given here.                                                    */
+#include "psow_ray.hpp"
+
 /*  Namespace for the project. "Peter-Shirley-One-Weekend."                   */
 namespace psow {
 
-    /*  Struct for rays which are Affine subspaces of R^3, L = {A+tB, t real}.*/
-    struct ray {
+    /*  Struct for dealing with spheres.                                      */
+    struct sphere {
 
-        /*  A ray is the set of all points of the form p + tv, where p and v  *
-         *  are vectors and t is a real number.                               */
-        vec3 p, v;
+        /*  A sphere is defined by its radius and its center.                 */
+        double radius;
+        vec3 center;
 
-        /*  Empty construct, simply return.                                   */
-        inline ray(void)
+        /*  Empty constructor. Return NULL.                                   */
+        inline sphere(void)
         {
             return;
         }
 
-        /*  Constructor from a starting point and a direction.                */
-        inline ray(const vec3 &P, const vec3 &V)
+        /*  Main constructor.                                                 */
+        inline sphere(double r, const psow::vec3 &c)
         {
-            p = P;
-            v = V;
+            radius = r;
+            center = c;
         }
 
-        /*  Computes a point on a ray from a real parameter. p + t*v.         */
-        inline vec3 point(double t) const;
-
-        /*  Function for creating a ray from two points on the ray.           */
-        inline ray from_points(const vec3 &P, const vec3 &V);
+        /*  Function for determining if a ray intersects a sphere.            */
+        inline bool intersects_ray(const psow::ray &r) const;
     };
-    /*  End of ray struct.                                                    */
+    /*  End of definition of sphere.                                          */
 }
 /*  End of "psow" namespace.                                                  */
 
-/*  Function for compute the point p + tv on the ray.                         */
-inline psow::vec3 psow::ray::point(double t) const
+/*  Since a sphere satisfies (x-x0)^2 + (y-y0)^2 + (z-z0)^2 = r^2, given a    *
+ *  ray L(t) = p + tv, solving for which values of t satisfy the sphere's     *
+ *  equation amounts to solving a quadratic equation.                         */
+inline bool psow::sphere::intersects_ray(const psow::ray &r) const
 {
-    return p + v*t;
-}
+    const psow::vec3 oc = r.p - center;
+    const double a = r.v.normsq();
+    const double b = 2.0 * r.v.dot(oc);
+    const double c = oc.normsq() - radius*radius;
+    const double D = b*b - 4.0*a*c;
 
+    if (D > 0.0)
+    {
+        const double sqrt_D = std::sqrt(D);
 
-/*  Creates a ray from two points that fall on it.                            */
-inline psow::ray
-psow::ray::from_points(const psow::vec3 &A, const psow::vec3 &B)
-{
-    /*  A tangent vector for the ray is given by the relative positive        *
-     *  vector going from A to B. Compute this ray.                           */
-    return psow::ray(A, B-A);
+        if (sqrt_D - b > 0.0)
+            return true;
+
+        return false;
+    }
+
+    return false;
 }
+/*  End of intersects_ray.                                                    */
 
 #endif
 /*  End of include guard.                                                     */
