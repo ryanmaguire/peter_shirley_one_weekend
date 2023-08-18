@@ -146,6 +146,14 @@ inline psow::vec3 operator / (const psow::vec3 &P, double a)
     return psow::vec3(rcpr_a*P.x, rcpr_a*P.y, rcpr_a*P.z);
 }
 
+/*  Scalar division operator.                                                 */
+inline void operator /= (psow::vec3 &P, double t)
+{
+    const double rcpr_t = 1.0 / t;
+    P.x *= rcpr_t;
+    P.y *= rcpr_t;
+    P.z *= rcpr_t;
+}
 
 /*  Euclidean norm (the length of the vector).                                */
 inline double psow::vec3::norm(void) const
