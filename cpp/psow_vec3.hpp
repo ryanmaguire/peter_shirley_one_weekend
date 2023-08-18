@@ -91,10 +91,26 @@ inline psow::vec3 operator + (const psow::vec3 &P, const psow::vec3 &Q)
     return psow::vec3(P.x + Q.x, P.y + Q.y, P.z + Q.z);
 }
 
+/*  Vector addition operator.                                                 */
+inline void operator += (psow::vec3 &P, const psow::vec3 &Q)
+{
+    P.x += Q.x;
+    P.y += Q.y;
+    P.z += Q.z;
+}
+
 /*  Vector subtraction operator.                                              */
 inline psow::vec3 operator - (const psow::vec3 &P, const psow::vec3 &Q)
 {
     return psow::vec3(P.x - Q.x, P.y - Q.y, P.z - Q.z);
+}
+
+/*  Vector subtraction operator.                                              */
+inline void operator -= (psow::vec3 &P, const psow::vec3 &Q)
+{
+    P.x -= Q.x;
+    P.y -= Q.y;
+    P.z -= Q.z;
 }
 
 /*  Vector negation.                                                          */
@@ -113,6 +129,14 @@ inline psow::vec3 operator * (const psow::vec3 &P, double a)
 inline psow::vec3 operator * (double a, const psow::vec3 &P)
 {
     return psow::vec3(a*P.x, a*P.y, a*P.z);
+}
+
+/*  Scalar multiplication operator.                                           */
+inline void operator *= (psow::vec3 &P, double t)
+{
+    P.x *= t;
+    P.y *= t;
+    P.z *= t;
 }
 
 /*  Scalar division on the right.                                             */
