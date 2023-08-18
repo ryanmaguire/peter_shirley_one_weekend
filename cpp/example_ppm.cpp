@@ -32,16 +32,13 @@
 /*  Function for creating a PPM file with a color gradient.                   */
 int main(void)
 {
-    /*  We'll write the output to a .ppm file. Open this with fopen.          */
-    FILE *fp = std::fopen("basic_ppm.ppm", "w");
-
     /*  We'll create a 1024x1024 picture. Save this in the variable "size".   */
     unsigned int size = 1024U;
 
     /*  The value 255 / (size-1) is used to compute the color gradient. 255   *
      *  is the maximum value allowed in the RGB format, so 255 / (size - 1)   *
      *  can be used to "normalize" the value.                                 */
-    double factor = 255.0 / (double)(size - 1U);
+    double factor = 255.0 / static_cast<double>(size - 1U);
 
     /*  The RGB value is three unsigned integers between 0 and 255            *
      *  representing the intensity of Red, Green, and Blue respectively.      */
@@ -51,6 +48,9 @@ int main(void)
      *  indexing variables inside of the for loop (C99 and higher allows this *
      *  as well), but I find this ugly as sin.                                */
     unsigned int x, y;
+
+    /*  We'll write the output to a .ppm file. Open this with fopen.          */
+    FILE *fp = std::fopen("basic_ppm.ppm", "w");
 
     /*  fopen returns NULL on failure. Check that this didn't happen.         */
     if (!fp)
@@ -81,9 +81,9 @@ int main(void)
         {
             /*  Compute the RGB value as a gradient based on the where the    *
              *  current pixel lies.                                           */
-            red   = (unsigned char)((double)x * factor);
-            green = (unsigned char)((double)y * factor);
-            blue  = 64U;
+            red = static_cast<unsigned char>(x * factor);
+            green = static_cast<unsigned char>(y * factor);
+            blue = 64U;
 
             /*  Write the RGB value to the file.                              */
             std::fputc(red, fp);

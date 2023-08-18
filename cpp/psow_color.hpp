@@ -108,7 +108,7 @@ namespace psow {
         }
 
         /*  Function for writing the color to a PPM file.                     */
-        void write(FILE *fp)
+        void write(FILE *fp) const
         {
             std::fputc(red, fp);
             std::fputc(green, fp);

@@ -42,7 +42,7 @@ int main(void)
     /*  The value 255 / (size-1) is used to compute the color gradient. 255   *
      *  is the maximum value allowed in the RGB format, so 255 / (size - 1)   *
      *  can be used to "normalize" the value.                                 */
-    double factor = 255.0 / (double)(size - 1U);
+    double factor = 255.0 / static_cast<double>(size - 1U);
 
     /*  The RGB value is three unsigned integers between 0 and 255            *
      *  representing the intensity of Red, Green, and Blue respectively.      */
@@ -82,9 +82,9 @@ int main(void)
         {
             /*  Compute the RGB value as a gradient based on the where the    *
              *  current pixel lies.                                           */
-            red   = (unsigned char)((double)x * factor);
-            green = (unsigned char)((double)y * factor);
-            blue  = 64U;
+            red = static_cast<unsigned char>(x * factor);
+            green = static_cast<unsigned char>(y * factor);
+            blue = 64U;
 
             /*  Write the RGB value to the file.                              */
             std::fputc(red, fp);
